@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cadete {
+  id_cadete Int        @id @default(autoincrement())
+  dni       BigInt?
+  persona   persona?   @relation(fields: [dni], references: [nro_dni], onDelete: NoAction, onUpdate: NoAction)
+  delivery  delivery[]
+}
+
+model cliente {
+  id_cliente        Int                 @id @default(autoincrement())
+  dni               BigInt?
+  persona           persona?            @relation(fields: [dni], references: [nro_dni], onDelete: NoAction, onUpdate: NoAction)
+  direccion_cliente direccion_cliente[]
+}
+
+model delivery {
+  id_delivery     Int              @id @default(autoincrement())
+  estado          Int?
+  id_cadete       Int?
+  id_pedido       Int?
+  estado_delivery estado_delivery? @relation(fields: [estado], references: [id_estado], onDelete: NoAction, onUpdate: NoAction)
+  cadete          cadete?          @relation(fields: [id_cadete], references: [id_cadete], onDelete: NoAction, onUpdate: NoAction)
+  pedido          pedido?          @relation(fields: [id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model detalle_pedido {
+  id_detalle_pedido Int     @id @default(autoincrement())
+  id_pedido         Int?
+  cantidad          Int
+  sub_total         Decimal @db.Decimal
+  id_trago          Int?
+  pedido            pedido? @relation(fields: [id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction)
+  trago             trago?  @relation(fields: [id_trago], references: [id_trago], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model direccion {
+  id_direccion      Int                 @id @default(autoincrement())
+  calle             String
+  numero            Int
+  departamento      String?             @db.VarChar(6)
+  piso              Int?                @db.SmallInt
+  descripcion       String?
+  direccion_cliente direccion_cliente[]
+}
+
+model direccion_cliente {
+  id_direccion_cliente Int        @id @default(autoincrement())
+  id_direccion         Int?
+  id_cliente           Int?
+  cliente              cliente?   @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction)
+  direccion            direccion? @relation(fields: [id_direccion], references: [id_direccion], onDelete: NoAction, onUpdate: NoAction)
+  pedido               pedido[]
+}
+
+model estado_delivery {
+  id_estado Int        @id @default(autoincrement())
+  nombre    String
+  delivery  delivery[]
+}
+
+model pedido {
+  id_pedido            Int                @id @default(autoincrement())
+  fecha_hora           DateTime?          @default(now()) @db.Timestamp(6)
+  id_direccion_cliente Int?
+  delivery             delivery[]
+  detalle_pedido       detalle_pedido[]
+  direccion_cliente    direccion_cliente? @relation(fields: [id_direccion_cliente], references: [id_direccion_cliente], onDelete: NoAction, onUpdate: NoAction)
+  venta                venta[]
+}
+
+model persona {
+  nro_dni  BigInt    @id
+  nombre   String
+  apellido String
+  telefono BigInt?
+  cadete   cadete[]
+  cliente  cliente[]
+}
+
+model trago {
+  id_trago        Int              @id @default(autoincrement())
+  nombre          String
+  precio_unitario Decimal          @db.Decimal
+  descripcion     String?
+  detalle_pedido  detalle_pedido[]
+}
+
+model venta {
+  id_venta  Int     @id @default(autoincrement())
+  id_pedido Int?
+  total     Decimal @db.Decimal
+  pedido    pedido? @relation(fields: [id_pedido], references: [id_pedido], onDelete: NoAction, onUpdate: NoAction)
+}
