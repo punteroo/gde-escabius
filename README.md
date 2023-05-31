@@ -17,6 +17,7 @@ El sistema fue desarrollado por los alumnos integrantes del grupo 9 en Gestión 
 - **MAIRONE, Nicolás Nahuel**
 - **MARTINI, Leopoldo**
 - **MAZA BIANCHI, Lucas**
+- **PALACIOS, Lucas**
 - **PEDRAZA, Santiago**
 
 ## Instalación
