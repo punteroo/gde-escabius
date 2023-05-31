@@ -6,67 +6,108 @@
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Escabius System
+Microservicio escrito en el framework **NestJS** encargado de demostrar un ejemplo de portado de esquemas (migraciones y data pull) utilizando **Prisma**. Esta es una aplicación **database-first**.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+El alcance del sistema es un **delivery de bebidas alcóholicas y no alcóholicas**.
 
-## Installation
+El sistema fue desarrollado por los alumnos integrantes del grupo 9 en Gestión de Datos 2023 UTN FRVM:
+- **IBARRA, Álvaro**
+- **MAIRONE, Nicolás Nahuel**
+- **MARTINI, Leopoldo**
+- **MAZA BIANCHI, Lucas**
+- **PEDRAZA, Santiago**
+
+## Instalación
+
+Clonar el repositorio.
 
 ```bash
+$ git clone https://github.com/punteroo/gde-escabius.git
+```
+
+Si no se tiene `yarn`, instalarlo previo a este comando con `npm i --global yarn`.
+
+```bash
+$ cd gde-escabius
 $ yarn install
 ```
 
-## Running the app
+<hr />
+
+## Configuración
+### Base de Ejemplo
+Dentro de `psql` dejamos un script `.sql` para crear la base de datos de ejemplo de **Escabius**, con algunos datos de ejemplo (clientes, pedidos, tragos, etcétera).
+
+Es recomendable ejecutar el script en PostgreSQL ya hecho.
+
+#### PostgreSQL w/ Docker
+```bash
+$ docker run --name postgres -e POSTGRES_PASSWORD=test12345 -d -p 5432:5432 postgres
+$ cat ./psql/db_struct.sql | docker exec -i postgres psql -U postgres
+```
+
+#### PostgreSQL en Socket (Local)
+```bash
+$ cat ./psql/db_struct.sql | psql -U postgres
+```
+
+#### PostgreSQL Remoto
+```bash
+$ cat ./psql/db_struct.sql | psql -U postgres -h 1.2.3.4 -p 5432
+```
+
+### Connection URI
+Esta app está construida para trabajar con **PostgreSQL**.
+
+Se debe modificar la variable de entorno que controla el connection string de Prisma para nuestra DB.
+
+```
+DATABASE_URL="postgresql://postgres:test12345@localhost:5432/escabius_db?schema=public"
+```
+
+De este valor modificar (de ser necesario) el user (`postgres`), la pass (`test12345`) y posiblemente (dependiendo del networking local en el entorno donde se ejecuta) el host (`localhost`) y (posiblemente) el puerto (`5432`).
+
+Finalmente la base de datos a donde trabajará Prisma (`escabius_db`). En caso de tener otro esquema en donde las tablas de la db pertenezcan, modificar el valor de `schema` al final del connect string.
+
+### First Boot
+Para la primer ejecución, solo correr el comando `yarn run start:db`. 
+
+Automáticamente se generará el esquema de Prisma en base a lo que exista en la base de datos y arrancará el microservicio.
+
+<hr />
+
+## Ejecución
+
+Este microservicio se encarga de configurar el lado de Prisma antes de lanzar su factory. Si se desea solo arrancar la aplicación de Nest:
 
 ```bash
-# development
+# desarrollo
 $ yarn run start
 
-# watch mode
+# modo watch
 $ yarn run start:dev
 
-# production mode
+# prod
 $ yarn run start:prod
 ```
 
-## Test
+Si se desea hacer un arranque graceful con la portación de esquema por Prisma<sup>*</sup>
 
 ```bash
-# unit tests
-$ yarn run test
+# desarrollo
+$ yarn run start:db
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+# modo watch
+$ yarn run start:db:dev
 ```
+
+<p style="color: #f7786f; font-size: 9pt">* El arranque graceful con Prisma <b>sobreescribirá el esquema actual</b> en la app. Tener en cuenta al momento de ejecución del script NPM.</p>
 
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
